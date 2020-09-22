@@ -2,8 +2,6 @@ version: '3'
 
 services:
     
-###### Kafka+Zookeeper Cluster
-
   zookeeper:
     container_name: zookeeper
     image: wurstmeister/zookeeper
@@ -45,3 +43,27 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://producer:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  connect:
+    container_name: connect
+    image: confluentinc/cp-kafka-connect:latest
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      CONNECT_GROUP_ID: 1
+      CONNECT_CONFIG_STORAGE_TOPIC: config
+      CONNECT_OFFSET_STORAGE_TOPIC: offset
+      CONNECT_STATUS_STORAGE_TOPIC: status
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_REST_PORT: 28083
+    ports:
+      - "8083"
+      - "28083"
+    volumes:
+      - /Users/seetasomagani/Projects/kafka-connect-demo/config:/config
+      - /Users/seetasomagani/Projects/kafka-connect-demo/data:/data
+      - /Users/seetasomagani/distributions/kafka_2.12-2.5.0/plugins:/plugins
