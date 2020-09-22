@@ -1,10 +1,13 @@
 # INSTRUCTIONS
 
-Create Topic
-opt/kafka/bin/kafka-topics.sh --bootstrap-server=localhost:9092 --create --topic=asdf
+## Create Topic
+docker exec -it kafka /bin/bash
+opt/kafka/bin/kafka-topics.sh --bootstrap-server=kafka:9092 --create --topic=asdf
 
-Publish to Topic
-opt/kafka/bin/kafka-console-producer.sh --bootstrap-server=localhost:9092 --topic=asdf
+## Create Publisher
+docker exec -it publisher /bin/bash
+opt/kafka/bin/kafka-console-producer.sh --bootstrap-server=kafka:9092 --topic=asdf
 
-Consume Topic
-opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server=localhost:9092 --topic=asdf
+## Create Consumer
+docker exec -it consumer /bin/bash
+opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server=kafka:9092 --topic=asdf
