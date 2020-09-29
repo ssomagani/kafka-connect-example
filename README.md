@@ -7,10 +7,6 @@ opt/kafka/bin/kafka-topics.sh --bootstrap-server=kafka:9092 --create --topic=asd
 
 ## Create Publisher
 
-javac -cp /Users/seetasomagani/distributions/kafka_2.12-2.5.0/libs/kafka_2.12-2.5.0.jar:/Users/seetasomagani/distributions/kafka_2.12-2.5.0/libs/kafka-clients-2.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/kafka-avro-serializer-5.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/kafka-schema-serializer-5.5.0.jar:. AvroProducer.java
-
-java -cp /Users/seetasomagani/distributions/kafka_2.12-2.5.0/libs/kafka_2.12-2.5.0.jar:/Users/seetasomagani/distributions/kafka_2.12-2.5.0/libs/kafka-clients-2.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/kafka-avro-serializer-5.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/kafka-schema-serializer-5.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/slf4j-api-1.7.26.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/kafka-schema-registry-client-5.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/common-config-5.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/avro-1.9.2.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/common-utils-5.5.0.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/jackson-core-2.10.2.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/jackson-databind-2.10.2.jar:/Users/seetasomagani/distributions/confluent-5.5.1/share/confluent-hub-components/confluentinc-kafka-connect-datagen/lib/jackson-annotations-2.10.2.jar:. AvroProducer
-
 docker exec -it producer /bin/bash
 
 opt/kafka/bin/kafka-console-producer.sh --bootstrap-server=kafka:9092 --topic=asdf
@@ -30,4 +26,21 @@ curl -X POST -H "Content-Type: application/json" -d @config/file-sink-distribute
 docker exec -it connect /bin/bash
 
 tail -f /data/asdf.json
+
+
+
+
+####CONNECT
+Caused by: org.apache.kafka.common.errors.SerializationException: Error retrieving Avro value schema version for id 2
+Caused by: io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException: Subject 'avrostream-value' not found.; error code: 40401
+
+####Schema Registry
+schemaregistry_1  | io.confluent.rest.exceptions.RestNotFoundException: Subject 'avrostream-value' not found.
+
+#####Volt
+create opaque topic avrostream-value;
+[Ad Hoc DDL Input]: VoltDB DDL Error: "Invalid CREATE OPAQUE TOPIC statement: "create opaque topic avrostream-value", expected syntax: "CREATE OPAQUE TOPIC {name} [PARTITIONED] [ALLOW [PRODUCER | CONSUMER] {roles}] [PROFILE {profile}]""
+
+
+
 
