@@ -1,0 +1,6 @@
+{
+  "name": "pvc-disk",
+  "sizeGb": "10",
+  "type": "projects/fourth-epigram-293718/zones/us-central1-a/diskTypes/pd-standard",
+  "zone": "projects/fourth-epigram-293718/zones/us-east4-a"
+}

@@ -1,0 +1,51 @@
+---
+apiVersion: "apps/v1"
+kind: "StatefulSet"
+metadata:
+  name: "voltdb"
+  namespace: "default"
+  labels:
+    app: "voltdb"
+spec:
+  serviceName: "voltdb"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "voltdb"
+  template:
+    metadata:
+      labels:
+        app: "voltdb"
+    spec:
+#      securityContext:
+#        runAsUser: 1000
+#        runAsGroup: 3000
+#        fsGroup: 2000
+      containers:
+      - name: "voltdb"
+        image: "us.gcr.io/fourth-epigram-293718/voltdb-enterprise-dev:feature-kipling-publish-api"
+        command: ["/opt/voltdb/tools/kubernetes/test-entrypoint.sh"]
+        env:
+        - name: "VOLTDB_CONFIG"
+          value: "/voltdb-config/deployment.xml"
+        - name: "VOLTDB_LICENSE"
+          value: "/voltdb-config/license.xml"
+        volumeMounts:
+        - mountPath: /voltdb
+          name: kipling-pvc
+        - name: voltdb-config
+          mountPath: /voltdb-config
+      volumes:
+      - name: voltdb-config
+        configMap:
+          name: voltdb-config
+  volumeClaimTemplates:
+  - metadata:
+      name: kipling-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+
+---

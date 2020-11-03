@@ -21,13 +21,6 @@
 set -e
 
 function init() {
-    if [ -f  ${CUSTOM_CONFIG} ]; then
-        DEPLOYMENT=${CUSTOM_CONFIG}
-    else
-        DEPLOYMENT=${DEFAULT_DEPLOYMENT}
-    fi
-
-#    INIT_OPTIONS="-C ${DEPLOYMENT} -D ${DIRECTORY_SPEC}"
     INIT_OPTIONS="-C /tmp/deployment.xml -l /tmp/license.xml"
     echo "Run voltdb init $INIT_OPTIONS"
     voltdb init ${INIT_OPTIONS}
@@ -35,13 +28,16 @@ function init() {
 
 function execVoltdbStart() {
  
-    echo "Run voltdb start "
-    exec voltdb start 
-#    echo "Started Volt process in the background"
-#    sleep 10
-#    exec sqlcmd < init.ddl
-#    jobs -l
-#    fg %1
+     if [ -n "${HOST_COUNT}" ]; then
+        OPTIONS=" -c $HOST_COUNT"
+    fi
+
+    if [ -n "${HOSTS}" ]; then
+        OPTIONS="$OPTIONS -H $HOSTS"
+    fi
+    
+    echo "Run voltdb start $OPTIONS"
+    exec voltdb start $OPTIONS
 }
 
 if [ ! -f ${DIRECTORY_SPEC}/voltdbroot/.initialized ]; then
@@ -49,5 +45,3 @@ if [ ! -f ${DIRECTORY_SPEC}/voltdbroot/.initialized ]; then
 fi
 
 execVoltdbStart
-
-#exec "$@ $OPTIONS"

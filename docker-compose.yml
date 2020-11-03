@@ -2,14 +2,46 @@ version: '3'
 
 services:
 
-  volt:
-    container_name: volt
+  volt-1:
+    container_name: volt-1
     image: voltdb/voltdb-enterprise-dev:feature-kipling-publish-api--latest
     ports:
-      - "8080:8080"
-      - "21212:21212"
+      - "18080:8080"
+      - "21213:21212"
     environment:
-      - HOST_COUNT=1
+      - HOSTS=volt-1,volt-2,volt-3
+    volumes:
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection/deployment.xml:/tmp/deployment.xml
+      - /Users/seetasomagani/voltdb/voltdb/license.xml:/tmp/license.xml
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection:/app
+      - /Users/seetasomagani/Projects/kafka-connect-example/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+      - /Users/seetasomagani/Projects/kafka-connect-example/init.ddl:/tmp/init.ddl
+    entrypoint: "./docker-entrypoint.sh"
+    
+  volt-2:
+    container_name: volt-2
+    image: voltdb/voltdb-enterprise-dev:feature-kipling-publish-api--latest
+    ports:
+      - "28080:8080"
+      - "21214:21212"
+    environment:
+      - HOSTS=volt-1,volt-2,volt-3
+    volumes:
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection/deployment.xml:/tmp/deployment.xml
+      - /Users/seetasomagani/voltdb/voltdb/license.xml:/tmp/license.xml
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection:/app
+      - /Users/seetasomagani/Projects/kafka-connect-example/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+      - /Users/seetasomagani/Projects/kafka-connect-example/init.ddl:/tmp/init.ddl
+    entrypoint: "./docker-entrypoint.sh"
+    
+  volt-3:
+    container_name: volt-3
+    image: voltdb/voltdb-enterprise-dev:feature-kipling-publish-api--latest
+    ports:
+      - "38080:8080"
+      - "21215:21212"
+    environment:
+      - HOSTS=volt-1,volt-2,volt-3
     volumes:
       - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection/deployment.xml:/tmp/deployment.xml
       - /Users/seetasomagani/voltdb/voltdb/license.xml:/tmp/license.xml
@@ -22,7 +54,7 @@ services:
     container_name: connect
     image: confluentinc/cp-kafka-connect:latest
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: PLAINTEXT://volt:9999
+      CONNECT_BOOTSTRAP_SERVERS: PLAINTEXT://volt-1:9999,PLAINTEXT://volt-2:9999,PLAINTEXT://volt-3:9999
       CONNECT_GROUP_ID: 1
       CONNECT_CONFIG_STORAGE_TOPIC: CONFIG
       CONNECT_OFFSET_STORAGE_TOPIC: OFFSET
@@ -40,9 +72,9 @@ services:
       - "8083"
       - "28083"
     depends_on:
-      - volt
+      - volt-1
     links:
-      - volt
+      - volt-1
     volumes:
       - /Users/seetasomagani/Projects/kafka-connect-example/config:/config
       - /Users/seetasomagani/Projects/kafka-connect-example/data:/data
@@ -52,13 +84,13 @@ services:
     image: confluentinc/cp-schema-registry
     container_name: schemaregistry
     depends_on:
-      - volt
+      - volt-1
     links:
-      - volt
+      - volt-1
     ports:
       - "8081:8081"
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://volt:9999
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://volt-1:9999,PLAINTEXT://volt-2:9999,PLAINTEXT://volt-3:9999
       SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry

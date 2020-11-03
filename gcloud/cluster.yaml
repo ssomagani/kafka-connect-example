@@ -1,0 +1,75 @@
+{
+  "cluster": {
+    "name": "kipling-cluster",
+    "masterAuth": {
+      "clientCertificateConfig": {}
+    },
+    "network": "projects/fourth-epigram-293718/global/networks/default",
+    "addonsConfig": {
+      "httpLoadBalancing": {},
+      "horizontalPodAutoscaling": {},
+      "kubernetesDashboard": {
+        "disabled": true
+      },
+      "dnsCacheConfig": {},
+      "gcePersistentDiskCsiDriverConfig": {}
+    },
+    "subnetwork": "projects/fourth-epigram-293718/regions/us-east4/subnetworks/default",
+    "nodePools": [
+      {
+        "name": "default-pool",
+        "config": {
+          "machineType": "e2-medium",
+          "diskSizeGb": 100,
+          "oauthScopes": [
+            "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/logging.write",
+            "https://www.googleapis.com/auth/monitoring",
+            "https://www.googleapis.com/auth/servicecontrol",
+            "https://www.googleapis.com/auth/service.management.readonly",
+            "https://www.googleapis.com/auth/trace.append"
+          ],
+          "metadata": {
+            "disable-legacy-endpoints": "true"
+          },
+          "imageType": "COS",
+          "diskType": "pd-standard",
+          "shieldedInstanceConfig": {
+            "enableIntegrityMonitoring": true
+          }
+        },
+        "initialNodeCount": 3,
+        "autoscaling": {},
+        "management": {
+          "autoUpgrade": true,
+          "autoRepair": true
+        },
+        "version": "1.16.13-gke.401",
+        "upgradeSettings": {
+          "maxSurge": 1
+        }
+      }
+    ],
+    "networkPolicy": {},
+    "ipAllocationPolicy": {
+      "useIpAliases": true
+    },
+    "masterAuthorizedNetworksConfig": {},
+    "autoscaling": {},
+    "defaultMaxPodsConstraint": {
+      "maxPodsPerNode": "110"
+    },
+    "authenticatorGroupsConfig": {},
+    "privateClusterConfig": {},
+    "databaseEncryption": {
+      "state": "DECRYPTED"
+    },
+    "shieldedNodes": {},
+    "releaseChannel": {},
+    "clusterTelemetry": {
+      "type": "ENABLED"
+    },
+    "initialClusterVersion": "1.16.13-gke.401",
+    "location": "us-east4-a"
+  }
+}
