@@ -1,0 +1,73 @@
+---
+apiVersion: "apps/v1"
+kind: "StatefulSet"
+metadata:
+  name: "voltdb"
+  namespace: "default"
+  labels:
+    app: "voltdb"
+spec:
+  serviceName: "voltdb"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "voltdb"
+  template:
+    metadata:
+      labels:
+        app: voltdb
+    spec:
+      subdomain: default-subdomain
+      hostname: voltdb
+      containers:
+      - name: voltdb
+        image: "us.gcr.io/fourth-epigram-293718/voltdb-enterprise-dev:feature-kipling-publish-api"
+        command: ["/opt/voltdb/tools/kubernetes/test-entrypoint.sh"]
+        ports:
+        - containerPort: 8080
+        env:
+        - name: "VOLTDB_CONFIG"
+          value: "/voltdb-config/deployment.xml"
+        - name: "VOLTDB_LICENSE"
+          value: "/voltdb-config/license.xml"
+        volumeMounts:
+        - mountPath: /voltdb
+          name: kipling-pvc
+        - name: voltdb-config
+          mountPath: /voltdb-config
+      volumes:
+      - name: voltdb-config
+        configMap:
+          name: voltdb-config
+  volumeClaimTemplates:
+  - metadata:
+      name: kipling-pvc
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-subdomain
+  labels:
+    app: voltdb
+spec:
+  selector:
+    app: voltdb
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: vmc
+    - port: 9999
+      targetPort: 9999
+      protocol: TCP
+      name: kafka
+    - port: 21212
+      targetPort: 21212
+      protocol: TCP
+      name: sqlcmd
+---

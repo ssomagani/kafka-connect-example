@@ -1,0 +1,89 @@
+---
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  name: voltdb
+spec:
+  containers:
+  - name: voltdb
+    image: us.gcr.io/fourth-epigram-293718/voltdb-enterprise-dev:feature-kipling-publish-api
+    command: ["/opt/voltdb/tools/kubernetes/test-entrypoint.sh"]
+    ports:
+    - containerPort: 8080
+    - containerPort: 9999
+    env:
+    - name: "VOLTDB_CONFIG"
+      value: "/voltdb-config/deployment.xml"
+    - name: "VOLTDB_LICENSE"
+      value: "/voltdb-config/license.xml"
+    volumeMounts:
+    - name: voltdb-config
+      mountPath: /voltdb-config
+  - name: schema-registry
+    image: confluentinc/cp-schema-registry
+    env:
+    - name: "SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS"
+      value: "PLAINTEXT://0.0.0.0:9999"
+    - name: "SCHEMA_REGISTRY_KAFKASTORE_TOPIC"
+      value: "_schemas"
+    - name: "SCHEMA_REGISTRY_LISTENERS"
+      value: "http://0.0.0.0:8081"
+    - name: "SCHEMA_REGISTRY_HOST_NAME"
+      value: "schemaregistry"
+    ports:
+    - containerPort: 8081
+  - name: kafka-connect-jdbc
+    image: us.gcr.io/fourth-epigram-293718/kafka-connect-jdbc
+    env: 
+    - name: CONNECT_BOOTSTRAP_SERVERS
+      value: "PLAINTEXT://0.0.0.0:9999"
+    - name: CONNECT_GROUP_ID
+      value: "1"
+    - name: CONNECT_CONFIG_STORAGE_TOPIC
+      value: CONFIG
+    - name: CONNECT_OFFSET_STORAGE_TOPIC
+      value: OFFSET
+    - name: CONNECT_STATUS_STORAGE_TOPIC
+      value: STATUS
+    - name: CONNECT_KEY_CONVERTER
+      value: "io.confluent.connect.avro.AvroConverter"
+    - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
+      value: "http://localhost:8081"
+    - name: CONNECT_VALUE_CONVERTER
+      value: "io.confluent.connect.avro.AvroConverter"
+    - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
+      value: "http://localhost:8081"
+    - name: CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR
+      value: "1"
+    - name: CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR
+      value: "1"
+    - name: CONNECT_STATUS_STORAGE_REPLICATION_FACTOR
+      value: "1"
+    - name: CONNECT_REST_PORT
+      value: "8083"
+    - name: CONNECT_REST_ADVERTISED_HOST_NAME
+      value: "localhost"
+    ports:
+    - containerPort: 8083
+    volumeMounts:
+    - name: connect-config
+      mountPath: /connect-config
+  - name: mysql
+    image: mysql:latest
+    env:
+    - name: MYSQL_DATABASE
+      value: "db"
+    - name: MYSQL_USER
+      value: "user"
+    - name: MYSQL_PASSWORD
+      value: "password"
+    - name: MYSQL_ROOT_PASSWORD
+      value: "password"
+  volumes:
+  - name: voltdb-config
+    configMap:
+      name: voltdb-config
+  - name: connect-config
+    configMap:
+      name: connect-config
+---

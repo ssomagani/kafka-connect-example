@@ -19,7 +19,7 @@
       {
         "name": "default-pool",
         "config": {
-          "machineType": "e2-medium",
+          "machineType": "e2-standard-16",
           "diskSizeGb": 100,
           "oauthScopes": [
             "https://www.googleapis.com/auth/devstorage.read_only",
@@ -38,7 +38,7 @@
             "enableIntegrityMonitoring": true
           }
         },
-        "initialNodeCount": 3,
+        "initialNodeCount": 1,
         "autoscaling": {},
         "management": {
           "autoUpgrade": true,

@@ -13,15 +13,19 @@ gcloud container clusters list
 gcloud container clusters get-credentials kipling-cluster --zone us-east4-a --project fourth-epigram-293718
 
 kubectl create configmap voltdb-config --from-file ../configMap/
-kubectl create -f voltdb.yaml
-
+kubectl create configmap connect-config --from-file ../config/
+kubectl create -f kafka.yaml
+<!--kubectl create -f schema-registry.yaml -->
 
 ----------------
 --- Validation ---
 kubectl get pods
 kubectl describe pod voltdb-----------
+kubectl get pods voltdb -o jsonpath='{.spec.containers[*].name}'
 kubectl exec -it voltdb bash
 gcloud compute ssh <instance_name> --zone=<instance_zone>
+
+netstat -plnt | grep 9999
 
 ----------------
 --- Destroy ---

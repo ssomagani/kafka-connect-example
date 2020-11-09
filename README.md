@@ -11,12 +11,14 @@ CREATE STREAM FRAUD partition on column CARD_ID (
   ACTIVITY_TYPE TINYINT not null,
   AMT integer not null
 );
-create topic using stream FRAUD format avro keys TRANS_ID;
+create topic using stream FRAUD PROPERTIES (topic.format=avro,consumer.keys=TRANS_ID);
 
+insert into FRAUD values ('9999', 1, NOW, 2, 3, 4);
 
 ## Start MySQL Connector
-connect-standalone /config/connect-standalone-sink.properties /config/mysql-sink-standalone.properties 
+##connect-standalone /config/connect-standalone-sink.properties /config/mysql-sink-standalone.properties 
 
+connect-standalone connect-config/fraud-sink.properties connect-config/mysql-sink-FRAUD.properties
 
 # Issues
 

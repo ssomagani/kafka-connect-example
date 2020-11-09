@@ -5,7 +5,7 @@ metadata:
   name: "kafka-map"
   namespace: "default"
 data:
-  SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://voltdb:9999"
+  SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://10.0.0.4:9999"
   SCHEMA_REGISTRY_KAFKASTORE_TOPIC: "_schemas"
   SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
   SCHEMA_REGISTRY_HOST_NAME: "schemaregistry"
@@ -35,20 +35,20 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: "SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS"
-              name: "kipling-map"
+              name: "kafka-map"
         - name: "SCHEMA_REGISTRY_KAFKASTORE_TOPIC"
           valueFrom:
             configMapKeyRef:
               key: "SCHEMA_REGISTRY_KAFKASTORE_TOPIC"
-              name: "kipling-map"
+              name: "kafka-map"
         - name: "SCHEMA_REGISTRY_LISTENERS"
           valueFrom:
             configMapKeyRef:
               key: "SCHEMA_REGISTRY_LISTENERS"
-              name: "kipling-map"
+              name: "kafka-map"
         - name: "SCHEMA_REGISTRY_HOST_NAME"
           valueFrom:
             configMapKeyRef:
               key: "SCHEMA_REGISTRY_HOST_NAME"
-              name: "kipling-map"
+              name: "kafka-map"
 ---
