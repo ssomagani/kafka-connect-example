@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<deployment>
+    <cluster sitesperhost="2" kfactor="0"/>
+    <httpd enabled="true">
+        <jsonapi enabled="true"/>
+    </httpd>
+    <snapshot enabled="false"/>
+    <commandlog enabled="false">
+        <frequency/>
+    </commandlog>
+    <features>
+        <feature name="export" option="advanced"/>
+    </features>
+    <avro registry="http://schemaregistry:8081" namespace="mydb.voltdb"/>
+    <topics enabled="true">
+        <properties>
+            <property name="port">9999</property>
+            <property name="group.initial.rebalance.delay.ms">0</property>
+            <property name="retention.policy.threads">1</property>
+        </properties>
+        <profiles></profiles>
+    </topics>
+</deployment>

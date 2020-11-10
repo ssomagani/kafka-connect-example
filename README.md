@@ -1,7 +1,7 @@
 # INSTRUCTIONS
 
 ## Init Volt
-sqlcmd < init.ddl
+file init.ddl;
 
 CREATE STREAM FRAUD partition on column CARD_ID (
   TRANS_ID varchar not null,
@@ -44,3 +44,4 @@ connect-standalone connect-config/fraud-sink.properties connect-config/mysql-sin
 4. aws ec2 describe-network-interfaces --network-interface-ids eni-081c3aedaab310813
 5. mysql --host=107.20.60.231 --user=user --password=password
 
+netstat -lntp

@@ -1,0 +1,107 @@
+version: '3'
+
+services:
+
+  volt-1:
+    container_name: volt-1
+    image: voltdb/voltdb-enterprise-dev:feature-kipling-publish-api--latest
+    ports:
+      - "18080:8080"
+      - "21213:21212"
+    environment:
+      - HOSTS=volt-1,volt-2,volt-3
+    volumes:
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection/deployment.xml:/tmp/deployment.xml
+      - /Users/seetasomagani/voltdb/voltdb/license.xml:/tmp/license.xml
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection:/app
+      - /Users/seetasomagani/Projects/kafka-connect-example/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+      - /Users/seetasomagani/Projects/kafka-connect-example/init.ddl:/tmp/init.ddl
+    entrypoint: "./docker-entrypoint.sh"
+    
+  volt-2:
+    container_name: volt-2
+    image: voltdb/voltdb-enterprise-dev:feature-kipling-publish-api--latest
+    ports:
+      - "28080:8080"
+      - "21214:21212"
+    environment:
+      - HOSTS=volt-1,volt-2,volt-3
+    volumes:
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection/deployment.xml:/tmp/deployment.xml
+      - /Users/seetasomagani/voltdb/voltdb/license.xml:/tmp/license.xml
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection:/app
+      - /Users/seetasomagani/Projects/kafka-connect-example/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+      - /Users/seetasomagani/Projects/kafka-connect-example/init.ddl:/tmp/init.ddl
+    entrypoint: "./docker-entrypoint.sh"
+    
+  volt-3:
+    container_name: volt-3
+    image: voltdb/voltdb-enterprise-dev:feature-kipling-publish-api--latest
+    ports:
+      - "38080:8080"
+      - "21215:21212"
+    environment:
+      - HOSTS=volt-1,volt-2,volt-3
+    volumes:
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection/deployment.xml:/tmp/deployment.xml
+      - /Users/seetasomagani/voltdb/voltdb/license.xml:/tmp/license.xml
+      - /Users/seetasomagani/Projects/voltdb/examples/fraud-detection:/app
+      - /Users/seetasomagani/Projects/kafka-connect-example/docker-entrypoint.sh:/tmp/docker-entrypoint.sh
+      - /Users/seetasomagani/Projects/kafka-connect-example/init.ddl:/tmp/init.ddl
+    entrypoint: "./docker-entrypoint.sh"
+    
+  connect:
+    container_name: connect
+    image: confluentinc/cp-kafka-connect:latest
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: PLAINTEXT://volt-1:9999,PLAINTEXT://volt-2:9999,PLAINTEXT://volt-3:9999
+      CONNECT_GROUP_ID: 1
+      CONNECT_CONFIG_STORAGE_TOPIC: CONFIG
+      CONNECT_OFFSET_STORAGE_TOPIC: OFFSET
+      CONNECT_STATUS_STORAGE_TOPIC: STATUS
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schemaregistry:8081
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schemaregistry:8081
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_REST_PORT: 28083
+    ports:
+      - "8083"
+      - "28083"
+    depends_on:
+      - volt-1
+    links:
+      - volt-1
+    volumes:
+      - /Users/seetasomagani/Projects/kafka-connect-example/config:/config
+      - /Users/seetasomagani/Projects/kafka-connect-example/data:/data
+      - /Users/seetasomagani/distributions/confluentinc-kafka-connect-jdbc-5.5.1:/plugins
+
+  schemaregistry:
+    image: confluentinc/cp-schema-registry
+    container_name: schemaregistry
+    depends_on:
+      - volt-1
+    links:
+      - volt-1
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://volt-1:9999,PLAINTEXT://volt-2:9999,PLAINTEXT://volt-3:9999
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
+      
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
