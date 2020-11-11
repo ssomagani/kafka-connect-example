@@ -1,0 +1,4 @@
+create table FRAUD_MYSQL (TRANS_ID varchar(2048), CARD_ID int(11), DATE_TIME timestamp, STATION int(11), ACTIVITY_TYPE tinyint(4), AMT int(11), UPDATE_TIME timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP);
+
+create table FRAUD (TRANS_ID varchar(256), CARD_ID int(11), DATE_TIME bigint(20), STATION int(11), ACTIVITY_TYPE int(11), AMT int(11), UPDATE_TIME timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP);
+
